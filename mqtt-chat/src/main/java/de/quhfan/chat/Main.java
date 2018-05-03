@@ -1,63 +1,35 @@
 package de.quhfan.chat;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
-import de.quhfan.chat.mqtt.MQTTChat;
-
-public class Main implements PropertyChangeListener {
-
+public class Main extends Application {
+	/**
+	 * Startet die Anwendung.
+	 *
+	 * @param args
+	 *            Die Argumente
+	 */
 	public static void main(final String[] args) {
-		new Main(setUpChat());
-	}
-
-	private static MQTTChat setUpChat() {
-		final String serverAddr = "ServerAddress";
-		final String user = "user";
-		final String pw = "pw";
-		final String cert = "cert";
-		final Map<String, String> m = new HashMap<>();
-		m.put(serverAddr, "");
-		m.put(user, "");
-		m.put(pw, "");
-		m.put(cert, "");
-		final Configuration c = new Configuration("MQTTChat", m);
-		c.init();
-		c.save();
-		return new MQTTChat(c.getValue(user), c.getValue(pw), c.getValue(serverAddr), c.getValue(cert));
-	}
-
-	Chat m;
-
-	private Main(final Chat c) {
-		m = c;
-		m.connect();
-		m.addPropertyChangeListener(this);
-		m.openChat("/chat/+");
-		sendMessage(m, "Hello");
-
-		final Scanner scanner = new Scanner(System.in);
-		while (m.isConnected()) {
-			final String input = scanner.next();
-			sendMessage(m, input);
-		}
-		scanner.close();
-		m.disconnect();
+		Application.launch(args);
 	}
 
 	@Override
-	public void propertyChange(final PropertyChangeEvent evt) {
-		setNews((String) evt.getNewValue());
-	}
-
-	public void sendMessage(final Chat m, final String message) {
-		m.sendMessage("/chat/" + m.getUserName(), "{\"message\": \"" + message + "\"}");
-	}
-
-	public void setNews(final String news) {
-		System.out.print(news);
+	public void start(final Stage primaryStage) throws Exception {
+		final String res = "/de/quhfan/chat/";
+		final Controller software = new Controller(Controller.setUpChat());
+		final FXMLLoader loader = new FXMLLoader();
+		loader.setLocation(getClass().getResource(res + "ChatWindow.fxml"));
+		loader.setController(software);
+		final Parent root = loader.load();
+		final Scene scene = new Scene(root);
+		primaryStage.setTitle("MQTT Chat");
+		primaryStage.setScene(scene);
+		// primaryStage.getIcons().add(new Image(getClass().getResourceAsStream(res +
+		// "db.png")));
+		primaryStage.show();
 	}
 }
