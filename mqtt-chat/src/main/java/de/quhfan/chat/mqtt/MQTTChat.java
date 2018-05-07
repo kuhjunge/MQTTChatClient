@@ -1,6 +1,7 @@
 package de.quhfan.chat.mqtt;
 
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,9 +29,12 @@ public class MQTTChat implements Chat {
 		opts.setPassword(pw.toCharArray());
 
 		try {
-			if (pathToChert.length() > 1) {
+			if (pathToChert.length() > 1 &&
+					new File(pathToChert + username + ".key").exists()) {
 				opts.setSocketFactory(SslUtil.getSocketFactory(pathToChert + "ca.crt", pathToChert + username + ".crt",
 						pathToChert + username + ".key", ""));
+			} else {
+				LOG.log(Level.WARNING, "No Encryption");
 			}
 			client = new MqttAsyncClient(mqttServerAddress, username, persistence);
 			client.setCallback(cr);
