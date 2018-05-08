@@ -20,7 +20,7 @@ public class Main extends Application {
 	@Override
 	public void start(final Stage primaryStage) throws Exception {
 		final String res = "/de/quhfan/chat/";
-		final Controller software = new Controller(Controller.setUpChat());
+		final Controller software = new Controller();
 		final FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(getClass().getResource(res + "ChatWindow.fxml"));
 		loader.setController(software);
