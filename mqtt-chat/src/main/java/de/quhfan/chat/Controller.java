@@ -104,6 +104,7 @@ public class Controller implements PropertyChangeListener, Initializable {
 	}
 
 	public MQTTChat setUpChat(final Configuration c) {
-		return new MQTTChat(c.getValue(user), c.getValue(pw), c.getValue(serverAddr), c.getValue(certPath));
+		return new MQTTChat(c.getValue(user), c.getValue(pw), c.getValue(serverAddr), c.getValue(certPath),
+				"{\"message\": \"" + c.getValue(user) + " out!\"}", "/chat/" + c.getValue(user));
 	}
 }

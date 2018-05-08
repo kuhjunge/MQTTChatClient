@@ -21,16 +21,17 @@ public class MQTTChat implements Chat {
 	final MqttConnectOptions opts = new MqttConnectOptions();
 	private final String username;
 
-	public MQTTChat(final String username, final String pw, final String mqttServerAddress, final String pathToChert) {
+	public MQTTChat(final String username, final String pw, final String mqttServerAddress, final String pathToChert,
+			final String testament, final String testamentTopic) {
 		this.username = username;
 		opts.setMqttVersion(MqttConnectOptions.MQTT_VERSION_3_1_1);
 		opts.setCleanSession(true);
 		opts.setUserName(username);
 		opts.setPassword(pw.toCharArray());
-
+		// Last Will setzen
+		opts.setWill(testamentTopic, testament.getBytes(), 2, false);
 		try {
-			if (pathToChert.length() > 1 &&
-					new File(pathToChert + username + ".key").exists()) {
+			if (pathToChert.length() > 1 && new File(pathToChert + username + ".key").exists()) {
 				opts.setSocketFactory(SslUtil.getSocketFactory(pathToChert + "ca.crt", pathToChert + username + ".crt",
 						pathToChert + username + ".key", ""));
 			} else {
@@ -61,7 +62,7 @@ public class MQTTChat implements Chat {
 		if (!client.isConnected()) {
 			try {
 				client.connect(opts);
-				cr.setMessage("Connecting...");
+				cr.setMessage("Connecting.");
 				while (!client.isConnected()) {
 					cr.setMessage(".");
 					Thread.sleep(250);
@@ -134,6 +135,7 @@ public class MQTTChat implements Chat {
 	public void subscribe(final String topic, final int qos) {
 		if (checkConnected()) {
 			try {
+
 				client.subscribe(topic, qos);
 			} catch (final MqttException e) {
 				LOG.log(Level.SEVERE, "Subscription Error", e);
