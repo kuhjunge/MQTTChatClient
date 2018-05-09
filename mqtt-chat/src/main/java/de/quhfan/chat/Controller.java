@@ -20,7 +20,7 @@ public class Controller implements PropertyChangeListener, Initializable {
 
 	private Configuration conf;
 
-	Chat m;
+	private Chat m;
 
 	@FXML
 	private TextArea chatWindow;
@@ -43,15 +43,23 @@ public class Controller implements PropertyChangeListener, Initializable {
 	@FXML
 	private TextField textFieldTopic;
 
+	@FXML
+	private TextField textFieldSendTopic;
+
 	public Controller() {
 	}
 
 	@FXML
 	private void connect(final ActionEvent event) {
-		connect(textFieldTopic.getText());
+		if (m == null) {
+			connect(textFieldTopic.getText(), textFieldSendTopic.getText());
+		} else if (m.isConnected()) {
+			m.disconnect();
+			m = null;
+		}
 	}
 
-	public void connect(final String topic) {
+	public void connect(final String topic, String sendTopic) {
 		conf.setValue(serverAddr, textBoxServer.getText());
 		conf.setValue(user, textFieldUser.getText());
 		conf.setValue(pw, textFieldPw.getText());
@@ -61,7 +69,7 @@ public class Controller implements PropertyChangeListener, Initializable {
 		m.connect();
 		m.addPropertyChangeListener(this);
 		m.openChat(topic);
-		sendMessage(m, "Hello");
+		sendMessage(sendTopic, m, "Hello");
 	}
 
 	public void disconnect() {
@@ -82,6 +90,7 @@ public class Controller implements PropertyChangeListener, Initializable {
 		textFieldPw.setText(conf.getValue(pw));
 		textBoxCertificate.setText(conf.getValue(certPath));
 		textFieldTopic.setText("/chat/+");
+		textFieldSendTopic.setText("/chat/8");
 	}
 
 	@Override
@@ -91,12 +100,12 @@ public class Controller implements PropertyChangeListener, Initializable {
 
 	@FXML
 	private void sendMessage(final ActionEvent event) {
-		sendMessage(m, textFieldMessage.getText());
+		sendMessage(textFieldSendTopic.getText(), m, textFieldMessage.getText());
 		textFieldMessage.clear();
 	}
 
-	public void sendMessage(final Chat m, final String message) {
-		m.sendMessage("/chat/" + m.getUserName(), "{\"message\": \"" + message + "\"}");
+	public void sendMessage(String channel, final Chat m, final String message) {
+		m.sendMessage(channel, "{\"message\": \"" + message + "\"}");
 	}
 
 	public void setNews(final String news) {

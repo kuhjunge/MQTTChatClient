@@ -20,6 +20,7 @@ public class MQTTChat implements Chat {
 	private final MQTTChatReceiver cr = new MQTTChatReceiver();
 	final MqttConnectOptions opts = new MqttConnectOptions();
 	private final String username;
+	private static String eol = "\r\n";
 
 	public MQTTChat(final String username, final String pw, final String mqttServerAddress, final String pathToChert,
 			final String testament, final String testamentTopic) {
@@ -67,7 +68,7 @@ public class MQTTChat implements Chat {
 					cr.setMessage(".");
 					Thread.sleep(250);
 				}
-				cr.setMessage("\r\n");
+				cr.setMessage(eol);
 				return true;
 			} catch (final Exception e) {
 				LOG.log(Level.SEVERE, "Connection Error", e);
@@ -80,6 +81,7 @@ public class MQTTChat implements Chat {
 	public void disconnect() {
 		if (checkConnected()) {
 			try {
+				cr.setMessage("!Disconnectiong!" + eol);
 				client.disconnect();
 			} catch (final MqttException e) {
 				LOG.log(Level.SEVERE, "Disconnection Error", e);
@@ -135,7 +137,6 @@ public class MQTTChat implements Chat {
 	public void subscribe(final String topic, final int qos) {
 		if (checkConnected()) {
 			try {
-
 				client.subscribe(topic, qos);
 			} catch (final MqttException e) {
 				LOG.log(Level.SEVERE, "Subscription Error", e);
