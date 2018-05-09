@@ -23,7 +23,7 @@ public class MQTTChat implements Chat {
 	private static String eol = "\r\n";
 
 	public MQTTChat(final String username, final String pw, final String mqttServerAddress, final String pathToChert,
-			final String testament, final String testamentTopic) {
+			final String testament, final String testamentTopic, String clientId) {
 		this.username = username;
 		opts.setMqttVersion(MqttConnectOptions.MQTT_VERSION_3_1_1);
 		opts.setCleanSession(true);
@@ -38,7 +38,7 @@ public class MQTTChat implements Chat {
 			} else {
 				LOG.log(Level.WARNING, "No Encryption");
 			}
-			client = new MqttAsyncClient(mqttServerAddress, username, persistence);
+			client = new MqttAsyncClient(mqttServerAddress, clientId, persistence);
 			client.setCallback(cr);
 		} catch (final Exception e) {
 			LOG.log(Level.SEVERE, "Connection Error", e);
