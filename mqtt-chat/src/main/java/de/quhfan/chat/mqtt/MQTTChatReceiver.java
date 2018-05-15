@@ -1,6 +1,9 @@
 package de.quhfan.chat.mqtt;
+
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -8,6 +11,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 public class MQTTChatReceiver implements MqttCallback {
 	private static final String eol = "\r\n";
+	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
 	private String message;
 
@@ -23,25 +27,26 @@ public class MQTTChatReceiver implements MqttCallback {
 
 	@Override
 	public void connectionLost(final Throwable arg0) {
-		setMessage("!Connection lost!" + eol);
+		setMessage("Connection lost" + eol, true);
 	}
 
 	@Override
 	public void deliveryComplete(final IMqttDeliveryToken arg0) {
-		setMessage("!Send!" + eol);
+		setMessage("Send" + eol, true);
 	}
 
 	@Override
 	public void messageArrived(final String arg0, final MqttMessage arg1) throws Exception {
-		setMessage("+" + arg0 + ":" + arg1 + eol);
+		setMessage(arg0 + ": " + arg1 + eol, false);
 	}
 
 	public void removePropertyChangeListener(final PropertyChangeListener pcl) {
 		support.removePropertyChangeListener(pcl);
 	}
 
-	public void setMessage(final String value) {
-		support.firePropertyChange("news", message, value);
+	public void setMessage(final String value, final boolean system) {
+		support.firePropertyChange("news", message,
+				LocalDateTime.now().format(formatter) + (system ? "!" : ": ") + value);
 		message = value;
 	}
 }

@@ -23,8 +23,8 @@ public class MQTTAsyncChat implements Chat {
 	final MqttConnectOptions opts = new MqttConnectOptions();
 	private final String username;
 
-	public MQTTAsyncChat(final String username, final String pw, final String mqttServerAddress, final String pathToChert,
-			final String testament, final String testamentTopic, final String clientId) {
+	public MQTTAsyncChat(final String username, final String pw, final String mqttServerAddress,
+			final String pathToChert, final String testament, final String testamentTopic, final String clientId) {
 		this.username = username;
 		opts.setMqttVersion(MqttConnectOptions.MQTT_VERSION_3_1_1);
 		opts.setCleanSession(true);
@@ -64,11 +64,10 @@ public class MQTTAsyncChat implements Chat {
 		if (!client.isConnected()) {
 			try {
 				final IMqttToken conToken = client.connect(opts);
-				cr.setMessage("Connecting.");
+				cr.setMessage("Connecting..." + eol, true);
 				while (conToken != null && conToken.isComplete() == false) {
 					conToken.waitForCompletion();
 				}
-				cr.setMessage(eol);
 				return true;
 			} catch (final Exception e) {
 				LOG.log(Level.SEVERE, "Connection Error", e);
@@ -81,7 +80,7 @@ public class MQTTAsyncChat implements Chat {
 	public void disconnect() {
 		if (checkConnected()) {
 			try {
-				cr.setMessage("!Disconnectiong!" + eol);
+				cr.setMessage("Disconnectiong" + eol, true);
 				client.disconnect();
 			} catch (final MqttException e) {
 				LOG.log(Level.SEVERE, "Disconnection Error", e);
