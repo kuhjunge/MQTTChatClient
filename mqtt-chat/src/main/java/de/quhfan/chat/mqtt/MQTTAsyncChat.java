@@ -5,6 +5,7 @@ import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -13,17 +14,17 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import de.quhfan.chat.Chat;
 
-public class MQTTChat implements Chat {
-	private static final Logger LOG = Logger.getLogger(MQTTChat.class.getName());
+public class MQTTAsyncChat implements Chat {
+	private static final Logger LOG = Logger.getLogger(MQTTAsyncChat.class.getName());
+	private static String eol = "\r\n";
 	private final MemoryPersistence persistence = new MemoryPersistence();
 	private MqttAsyncClient client;
 	private final MQTTChatReceiver cr = new MQTTChatReceiver();
 	final MqttConnectOptions opts = new MqttConnectOptions();
 	private final String username;
-	private static String eol = "\r\n";
 
-	public MQTTChat(final String username, final String pw, final String mqttServerAddress, final String pathToChert,
-			final String testament, final String testamentTopic, String clientId) {
+	public MQTTAsyncChat(final String username, final String pw, final String mqttServerAddress, final String pathToChert,
+			final String testament, final String testamentTopic, final String clientId) {
 		this.username = username;
 		opts.setMqttVersion(MqttConnectOptions.MQTT_VERSION_3_1_1);
 		opts.setCleanSession(true);
@@ -62,11 +63,10 @@ public class MQTTChat implements Chat {
 	public boolean connect() {
 		if (!client.isConnected()) {
 			try {
-				client.connect(opts);
+				final IMqttToken conToken = client.connect(opts);
 				cr.setMessage("Connecting.");
-				while (!client.isConnected()) {
-					cr.setMessage(".");
-					Thread.sleep(250);
+				while (conToken != null && conToken.isComplete() == false) {
+					conToken.waitForCompletion();
 				}
 				cr.setMessage(eol);
 				return true;

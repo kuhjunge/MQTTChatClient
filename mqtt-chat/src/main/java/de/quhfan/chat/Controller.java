@@ -5,7 +5,7 @@ import java.beans.PropertyChangeListener;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import de.quhfan.chat.mqtt.MQTTChat;
+import de.quhfan.chat.mqtt.MQTTAsyncChat;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -112,8 +112,8 @@ public class Controller implements PropertyChangeListener, Initializable {
 		chatWindow.appendText(news);
 	}
 
-	public MQTTChat setUpChat(final Configuration c) {
-		return new MQTTChat(c.getValue(user), c.getValue(pw), c.getValue(serverAddr), c.getValue(certPath),
+	public MQTTAsyncChat setUpChat(final Configuration c) {
+		return new MQTTAsyncChat(c.getValue(user), c.getValue(pw), c.getValue(serverAddr), c.getValue(certPath),
 				"{\"message\": \"" + c.getValue(user) + " out!\"}", "/chat/" + c.getValue(user),c.getValue(user) + Math.random() );
 	}
 }
