@@ -6,11 +6,14 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import de.quhfan.chat.mqtt.MQTTAsyncChat;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
 public class Controller implements PropertyChangeListener, Initializable {
 	private final static String serverAddr = "ServerAddress";
@@ -23,7 +26,7 @@ public class Controller implements PropertyChangeListener, Initializable {
 	private Chat m;
 
 	@FXML
-	private TextArea chatWindow;
+	private TextFlow chatBox;
 
 	@FXML
 	private TextField textFieldMessage;
@@ -59,21 +62,29 @@ public class Controller implements PropertyChangeListener, Initializable {
 		}
 	}
 
-	public void connect(final String topic, String sendTopic) {
+	public void connect(final String topic, final String sendTopic) {
 		conf.setValue(serverAddr, textBoxServer.getText());
 		conf.setValue(user, textFieldUser.getText());
 		conf.setValue(pw, textFieldPw.getText());
 		conf.setValue(certPath, textBoxCertificate.getText());
 		conf.save();
 		m = setUpChat(conf);
-		m.connect();
+		m.connectClient();
 		m.addPropertyChangeListener(this);
 		m.openChat(topic);
+		setNews("Connect!!", true);
 		sendMessage(sendTopic, m, "Hello");
 	}
 
 	public void disconnect() {
-		m.disconnect();
+		if (m != null) {
+			m.disconnect();
+		}
+	}
+
+	@FXML
+	public void exitApplication(final ActionEvent event) {
+		Platform.exit();
 	}
 
 	@Override
@@ -85,6 +96,7 @@ public class Controller implements PropertyChangeListener, Initializable {
 		conf.setValue(certPath, "");
 		conf.init();
 		conf.save();
+		setNews("test", true);
 		textBoxServer.setText(conf.getValue(serverAddr));
 		textFieldUser.setText(conf.getValue(user));
 		textFieldPw.setText(conf.getValue(pw));
@@ -95,7 +107,9 @@ public class Controller implements PropertyChangeListener, Initializable {
 
 	@Override
 	public void propertyChange(final PropertyChangeEvent evt) {
-		setNews((String) evt.getNewValue());
+		final String str = (String) evt.getNewValue();
+		System.out.println(str);
+		setNews(str.substring(1), str.startsWith("!"));
 	}
 
 	@FXML
@@ -104,16 +118,26 @@ public class Controller implements PropertyChangeListener, Initializable {
 		textFieldMessage.clear();
 	}
 
-	public void sendMessage(String channel, final Chat m, final String message) {
+	public void sendMessage(final String channel, final Chat m, final String message) {
 		m.sendMessage(channel, "{\"message\": \"" + message + "\"}");
 	}
 
-	public void setNews(final String news) {
-		chatWindow.appendText(news);
+	public void setNews(final String news, final boolean red) {
+		final Text t1 = new Text();
+		if (red) {
+			t1.setFill(Color.RED);
+		} else {
+			t1.setFill(Color.BLACK);
+		}
+		t1.setText(news);
+		chatBox.getChildren().add(t1);
+		chatBox.getChildren().add(new Text(System.lineSeparator()));
+		System.out.println("proc");
 	}
 
 	public MQTTAsyncChat setUpChat(final Configuration c) {
 		return new MQTTAsyncChat(c.getValue(user), c.getValue(pw), c.getValue(serverAddr), c.getValue(certPath),
-				"{\"message\": \"" + c.getValue(user) + " out!\"}", "/chat/" + c.getValue(user),c.getValue(user) + Math.random() );
+				"{\"message\": \"" + c.getValue(user) + " out!\"}", "/chat/" + c.getValue(user),
+				c.getValue(user) + Math.random());
 	}
 }

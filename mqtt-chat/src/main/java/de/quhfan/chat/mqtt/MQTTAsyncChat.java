@@ -16,7 +16,6 @@ import de.quhfan.chat.Chat;
 
 public class MQTTAsyncChat implements Chat {
 	private static final Logger LOG = Logger.getLogger(MQTTAsyncChat.class.getName());
-	private static String eol = "\r\n";
 	private final MemoryPersistence persistence = new MemoryPersistence();
 	private MqttAsyncClient client;
 	private final MQTTChatReceiver cr = new MQTTChatReceiver();
@@ -60,13 +59,17 @@ public class MQTTAsyncChat implements Chat {
 	}
 
 	@Override
-	public boolean connect() {
+	public boolean connectClient() {
 		if (!client.isConnected()) {
 			try {
 				final IMqttToken conToken = client.connect(opts);
-				cr.setMessage("Connecting..." + eol, true);
+				cr.setMessage("Connecting...", true);
 				while (conToken != null && conToken.isComplete() == false) {
 					conToken.waitForCompletion();
+				}
+				while (!client.isConnected()) {
+					Thread.sleep(100);
+					cr.setMessage(".", true);
 				}
 				return true;
 			} catch (final Exception e) {
@@ -80,11 +83,16 @@ public class MQTTAsyncChat implements Chat {
 	public void disconnect() {
 		if (checkConnected()) {
 			try {
-				cr.setMessage("Disconnectiong" + eol, true);
+				cr.setMessage("Disconnectiong", true);
 				client.disconnect();
 			} catch (final MqttException e) {
 				LOG.log(Level.SEVERE, "Disconnection Error", e);
 			}
+		}
+		try {
+			client.close();
+		} catch (final MqttException e) {
+			LOG.log(Level.SEVERE, "Shutdown Error", e);
 		}
 	}
 

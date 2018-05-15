@@ -6,7 +6,7 @@ public interface Chat {
 
 	void addPropertyChangeListener(PropertyChangeListener pcl);
 
-	boolean connect();
+	boolean connectClient();
 
 	void disconnect();
 

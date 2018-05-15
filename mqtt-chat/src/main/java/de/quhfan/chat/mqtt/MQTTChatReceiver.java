@@ -10,7 +10,6 @@ import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 public class MQTTChatReceiver implements MqttCallback {
-	private static final String eol = "\r\n";
 	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
 	private String message;
@@ -27,17 +26,17 @@ public class MQTTChatReceiver implements MqttCallback {
 
 	@Override
 	public void connectionLost(final Throwable arg0) {
-		setMessage("Connection lost" + eol, true);
+		setMessage("Connection lost", true);
 	}
 
 	@Override
 	public void deliveryComplete(final IMqttDeliveryToken arg0) {
-		setMessage("Send" + eol, true);
+		setMessage("Send", true);
 	}
 
 	@Override
 	public void messageArrived(final String arg0, final MqttMessage arg1) throws Exception {
-		setMessage(arg0 + ": " + arg1 + eol, false);
+		setMessage(arg0 + ": " + arg1, false);
 	}
 
 	public void removePropertyChangeListener(final PropertyChangeListener pcl) {
@@ -45,8 +44,8 @@ public class MQTTChatReceiver implements MqttCallback {
 	}
 
 	public void setMessage(final String value, final boolean system) {
-		support.firePropertyChange("news", message,
-				LocalDateTime.now().format(formatter) + (system ? "!" : ": ") + value);
+		support.firePropertyChange("news", " " + message,
+				(system ? "!" : " ") + LocalDateTime.now().format(formatter) + ": " + value);
 		message = value;
 	}
 }

@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Main extends Application {
+
 	/**
 	 * Startet die Anwendung.
 	 *
@@ -17,10 +18,11 @@ public class Main extends Application {
 		Application.launch(args);
 	}
 
+	final Controller software = new Controller();
+
 	@Override
 	public void start(final Stage primaryStage) throws Exception {
 		final String res = "/de/quhfan/chat/";
-		final Controller software = new Controller();
 		final FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(getClass().getResource(res + "ChatWindow.fxml"));
 		loader.setController(software);
@@ -32,4 +34,10 @@ public class Main extends Application {
 		// "db.png")));
 		primaryStage.show();
 	}
+
+	@Override
+	public void stop() {
+		software.disconnect();
+	}
+
 }
