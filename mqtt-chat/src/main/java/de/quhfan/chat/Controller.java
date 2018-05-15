@@ -114,7 +114,9 @@ public class Controller implements PropertyChangeListener, Initializable {
 	}
 
 	public void sendMessage(final String channel, final Chat m, final String message) {
-		m.sendMessage(channel, "{\"message\": \"" + message + "\"}");
+		if (m != null && m.isConnected()) {
+			m.sendMessage(channel, "{\"message\": \"" + message + "\"}");
+		}
 	}
 
 	public void setNews(final String news, final boolean red) {
