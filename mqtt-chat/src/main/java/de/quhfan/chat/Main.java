@@ -38,6 +38,8 @@ public class Main extends Application {
 	@Override
 	public void stop() {
 		software.disconnect();
+		System.out.println("Closing");
+		System.exit(0);
 	}
 
 }

@@ -10,10 +10,8 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 
 public class Controller implements PropertyChangeListener, Initializable {
 	private final static String serverAddr = "ServerAddress";
@@ -26,7 +24,7 @@ public class Controller implements PropertyChangeListener, Initializable {
 	private Chat m;
 
 	@FXML
-	private TextFlow chatBox;
+	private TextArea chatBox;
 
 	@FXML
 	private TextField textFieldMessage;
@@ -72,7 +70,6 @@ public class Controller implements PropertyChangeListener, Initializable {
 		m.connectClient();
 		m.addPropertyChangeListener(this);
 		m.openChat(topic);
-		setNews("Connect!!", true);
 		sendMessage(sendTopic, m, "Hello");
 	}
 
@@ -96,7 +93,6 @@ public class Controller implements PropertyChangeListener, Initializable {
 		conf.setValue(certPath, "");
 		conf.init();
 		conf.save();
-		setNews("test", true);
 		textBoxServer.setText(conf.getValue(serverAddr));
 		textFieldUser.setText(conf.getValue(user));
 		textFieldPw.setText(conf.getValue(pw));
@@ -108,8 +104,7 @@ public class Controller implements PropertyChangeListener, Initializable {
 	@Override
 	public void propertyChange(final PropertyChangeEvent evt) {
 		final String str = (String) evt.getNewValue();
-		System.out.println(str);
-		setNews(str.substring(1), str.startsWith("!"));
+		setNews(str, str.startsWith("!"));
 	}
 
 	@FXML
@@ -123,16 +118,7 @@ public class Controller implements PropertyChangeListener, Initializable {
 	}
 
 	public void setNews(final String news, final boolean red) {
-		final Text t1 = new Text();
-		if (red) {
-			t1.setFill(Color.RED);
-		} else {
-			t1.setFill(Color.BLACK);
-		}
-		t1.setText(news);
-		chatBox.getChildren().add(t1);
-		chatBox.getChildren().add(new Text(System.lineSeparator()));
-		System.out.println("proc");
+		chatBox.appendText(news + "\r\n");
 	}
 
 	public MQTTAsyncChat setUpChat(final Configuration c) {

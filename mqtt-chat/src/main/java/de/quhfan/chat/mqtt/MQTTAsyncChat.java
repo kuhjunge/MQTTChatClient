@@ -84,13 +84,14 @@ public class MQTTAsyncChat implements Chat {
 		if (checkConnected()) {
 			try {
 				cr.setMessage("Disconnectiong", true);
-				client.disconnect();
+				client.disconnectForcibly();
 			} catch (final MqttException e) {
 				LOG.log(Level.SEVERE, "Disconnection Error", e);
 			}
 		}
 		try {
-			client.close();
+			client.close(true);
+			client = null;
 		} catch (final MqttException e) {
 			LOG.log(Level.SEVERE, "Shutdown Error", e);
 		}
