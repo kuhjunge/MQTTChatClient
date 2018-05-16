@@ -2,6 +2,7 @@ package de.quhfan.chat.mqtt;
 
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -125,8 +126,8 @@ public class MQTTAsyncChat implements Chat {
 	public void publish(final String topic, final String message) {
 		if (checkConnected()) {
 			try {
-				publish(topic, 2, message.getBytes());
-			} catch (final MqttException e) {
+				publish(topic, 2, message.getBytes("UTF-8"));
+			} catch (final MqttException | UnsupportedEncodingException e) {
 				LOG.log(Level.SEVERE, "Send Error", e);
 			}
 		}

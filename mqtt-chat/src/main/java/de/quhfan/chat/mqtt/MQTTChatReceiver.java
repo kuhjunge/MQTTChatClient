@@ -2,6 +2,7 @@ package de.quhfan.chat.mqtt;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -36,7 +37,7 @@ public class MQTTChatReceiver implements MqttCallback {
 
 	@Override
 	public void messageArrived(final String arg0, final MqttMessage arg1) throws Exception {
-		setMessage(arg0 + ": " + arg1, false);
+		setMessage(arg0 + ": " +new String(arg1.getPayload(), StandardCharsets.UTF_8), false);
 	}
 
 	public void removePropertyChangeListener(final PropertyChangeListener pcl) {
