@@ -91,6 +91,7 @@ public class Controller implements PropertyChangeListener, Initializable {
 		conf.setValue(user, "admin");
 		conf.setValue(pw, "");
 		conf.setValue(certPath, "");
+		conf.setValue("debug", Boolean.toString(false));
 		conf.init();
 		conf.save();
 		textBoxServer.setText(conf.getValue(serverAddr));
